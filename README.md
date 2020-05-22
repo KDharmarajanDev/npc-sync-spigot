@@ -1,1 +1,1 @@
-# npc-sync-spigot
+# NPCSyncPlugin

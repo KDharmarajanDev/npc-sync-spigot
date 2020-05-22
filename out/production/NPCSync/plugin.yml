@@ -1,0 +1,11 @@
+name: NPCSync
+version: 0.1
+author: Kartik Dharmarajan
+main: Mathematician.NPCSync.NPCSyncMain
+api-version: 1.12.2
+commands:
+  npcsync:
+    description: This command is in charge of syncing NPCs.
+    usage: §6/<command> <list|cancel|start| (playername)
+    permission: NPCSync.npcsync
+    permission-message: You don't have <permission>
