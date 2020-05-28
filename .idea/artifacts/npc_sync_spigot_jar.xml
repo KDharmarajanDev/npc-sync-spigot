@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="npc-sync-spigot:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/npc_sync_spigot_jar</output-path>
+    <root id="archive" name="npc-sync-spigot.jar">
+      <element id="module-output" name="npc-sync-spigot" />
+    </root>
+  </artifact>
+</component>
