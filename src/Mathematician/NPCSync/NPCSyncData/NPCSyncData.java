@@ -6,6 +6,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class NPCSyncData {
 
     private Vector offSet;
@@ -17,30 +19,42 @@ public class NPCSyncData {
         this.offSet = offSet;
         this.location = location;
         this.playerName = playerName;
-        createNPC(new ItemStack(Material.AIR),new ItemStack(Material.AIR),new ItemStack(Material.AIR),new ItemStack(Material.AIR));
+        try {
+            createNPC(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public NPCSyncData(Location location, String  playerName) {
         this.offSet = new Vector(0,0,0);
         this.location = location;
         this.playerName = playerName;
-        createNPC(new ItemStack(Material.AIR),new ItemStack(Material.AIR),new ItemStack(Material.AIR),new ItemStack(Material.AIR));
+        try {
+            createNPC(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public NPCSyncData(Location location, String  playerName, ItemStack boots, ItemStack leggings, ItemStack chestplate,  ItemStack helmet){
         this.offSet = new Vector(0,0,0);
         this.location = location;
         this.playerName = playerName;
-        createNPC(boots, leggings, chestplate, helmet);
+        try {
+            createNPC(boots, leggings, chestplate, helmet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void createNPC(ItemStack boots, ItemStack leggings, ItemStack chestplate,  ItemStack helmet){
+    private void createNPC(ItemStack boots, ItemStack leggings, ItemStack chestplate,  ItemStack helmet) {
         npc = new NPC(playerName, getNPCLocation(), boots, leggings, chestplate, helmet);
         npc.setLocation(getNPCLocation());
         showToAllPlayers();
     }
 
-    public void showToAllPlayers(){
+    public void showToAllPlayers() {
         npc.showToAllPlayers();
     }
 
@@ -48,7 +62,7 @@ public class NPCSyncData {
         return location.add(offSet);
     }
 
-    public void setNewLocation(Location location){
+    public void setNewLocation(Location location) {
         this.location = location;
         npc.setLocation(getNPCLocation());
     }

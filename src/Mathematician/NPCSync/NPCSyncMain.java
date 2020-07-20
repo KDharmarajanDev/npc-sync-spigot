@@ -10,15 +10,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.lang.reflect.Constructor;
+
 public class NPCSyncMain extends JavaPlugin {
 
     public static NPCSyncMain plugin;
     public static BukkitScheduler scheduler;
     private static String pluginInformationString = ChatColor.DARK_BLUE + "[" + ChatColor.GOLD + "NPC Sync" + ChatColor.DARK_BLUE + "]" + ChatColor.DARK_GRAY + " » " + ChatColor.GOLD;
+    private static ReflectionUtil reflectionUtil;
 
     @Override
     public void onEnable() {
-        //Initial Information
+                //Initial Information
         plugin = this;
         getLogger().info("Running NPC Sync Plugin!");
 
@@ -49,6 +52,14 @@ public class NPCSyncMain extends JavaPlugin {
         }
         getServer().getMessenger().registerIncomingPluginChannel(this, "npcsync:channel", new NPCSyncDataReceiver());
         getServer().getMessenger().registerOutgoingPluginChannel(this, "npcsync:channel");
+        reflectionUtil = new ReflectionUtil();
+        for(Constructor<?> e : reflectionUtil.getNMSClass("PacketPlayOutPlayerInfo").getConstructors()){
+            String result = "";
+            for(Class cl : e.getParameterTypes()){
+                result += cl.getCanonicalName() + ", ";
+            }
+            getLogger().info(result);
+        }
     }
 
     @Override
@@ -74,5 +85,9 @@ public class NPCSyncMain extends JavaPlugin {
             getLogger().severe("Plugin disabled!");
             getServer().getPluginManager().disablePlugin(this);
         }
+    }
+
+    public ReflectionUtil getReflectionUtil(){
+        return reflectionUtil;
     }
 }

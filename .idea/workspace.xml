@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="npc-sync-spigot:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="ce7d532e-8c57-40d1-9d6d-e9c8cf6cef59" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/ReflectionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/NPCSync_jar/NPCSync.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/Commands/MainCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/Commands/MainCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/Events/LeverPullEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/Events/LeverPullEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/Events/PlayerSprintEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/Events/PlayerSprintEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPC/NPC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPC/NPC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPC/NPCAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPC/NPCAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPC/PlayerSkin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPC/PlayerSkin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPCSyncData/NPCSyncData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPCSyncData/NPCSyncData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPCSyncMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mathematician/NPCSync/NPCSyncMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -43,5 +66,9 @@
       <screen x="0" y="23" width="1680" height="961" />
     </state>
     <state x="328" y="86" key="SettingsEditor/0.23.1680.961@0.23.1680.961" timestamp="1590643725195" />
+    <state x="510" y="336" key="com.intellij.ide.util.TipDialog" timestamp="1590728672857">
+      <screen x="0" y="23" width="1680" height="961" />
+    </state>
+    <state x="510" y="336" key="com.intellij.ide.util.TipDialog/0.23.1680.961@0.23.1680.961" timestamp="1590728672857" />
   </component>
 </project>

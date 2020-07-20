@@ -1,6 +1,5 @@
 package Mathematician.NPCSync.Commands;
 
-import Mathematician.NPCSync.NPCSyncData.NPCSyncData;
 import Mathematician.NPCSync.NPCSyncData.NPCSyncDataHandler;
 import Mathematician.NPCSync.NPCSyncMain;
 import org.bukkit.Bukkit;
@@ -8,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 

@@ -1,7 +1,5 @@
 package Mathematician.NPCSync.NPC;
 
-import Mathematician.NPCSync.NPCSyncMain;
-
 public enum NPCAction {
 
     STILL((byte) 0x00),

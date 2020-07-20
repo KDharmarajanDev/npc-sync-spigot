@@ -1,8 +1,7 @@
 name: NPCSync
-version: 0.4
+version: 0.5
 author: Kartik Dharmarajan
 main: Mathematician.NPCSync.NPCSyncMain
-api-version: 1.12.2
 commands:
   npcsync:
     description: This command is in charge of syncing NPCs.

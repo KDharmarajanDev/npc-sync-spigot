@@ -2,12 +2,6 @@ package Mathematician.NPCSync.NPC;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

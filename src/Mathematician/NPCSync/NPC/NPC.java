@@ -3,95 +3,149 @@ package Mathematician.NPCSync.NPC;
 import Mathematician.NPCSync.NPCSyncMain;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Iterator;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public class NPC {
 
     private PlayerSkin playerSkin;
-    private EntityPlayer npc;
+    private Object npc;
     private ItemStack boots;
     private ItemStack leggings;
     private ItemStack chestplate;
     private ItemStack helmet;
 
-    public NPC (String nameNPC, Location location, ItemStack boots, ItemStack leggings, ItemStack chestplate,  ItemStack helmet){
+    public NPC (String nameNPC, Location location, ItemStack boots, ItemStack leggings, ItemStack chestplate,  ItemStack helmet) {
+        try {
+            playerSkin = new PlayerSkin(nameNPC);
 
-        playerSkin = new PlayerSkin(nameNPC);
+            Object nmsServer = NPCSyncMain.plugin.getReflectionUtil().getGetMinecraftServerMethod().invoke(Bukkit.getServer());
 
-        MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), nameNPC);
-        gameProfile.getProperties().put("textures", new Property("textures",playerSkin.getInfo()[0], playerSkin.getInfo()[1]));
+            Object nmsWorld = NPCSyncMain.plugin.getReflectionUtil().getGetWorldServer().invoke(location.getWorld());
+            GameProfile gameProfile = new GameProfile(UUID.randomUUID(), nameNPC);
+            gameProfile.getProperties().put("textures", new Property("textures", playerSkin.getInfo()[0], playerSkin.getInfo()[1]));
 
-        npc = new EntityPlayer(nmsServer, nmsWorld, gameProfile, new PlayerInteractManager(nmsWorld));
-        npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-
-        setArmor(boots, leggings, chestplate, helmet);
+            npc = NPCSyncMain.plugin.getReflectionUtil().getEntityPlayerConstructor().newInstance(nmsServer, nmsWorld, gameProfile,
+                    NPCSyncMain.plugin.getReflectionUtil().getPlayerInteractManagerConstructor().newInstance(nmsWorld));
+            NPCSyncMain.plugin.getReflectionUtil().getSetNPCLocationMethod().invoke(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+            setArmor(boots, leggings, chestplate, helmet);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public void showToPlayer(Player player){
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
-        Bukkit.getScheduler().scheduleSyncDelayedTask(NPCSyncMain.plugin, new Runnable() {
-            @Override
-            public void run() {
-                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, npc));
-            }
-        }, 5);
+    public void showToPlayer(Player player) {
+        try {
+            Object entityPlayer = NPCSyncMain.plugin.getReflectionUtil().getGetHandleMethod().invoke(player);
+            Object playerConnection = NPCSyncMain.plugin.getReflectionUtil().getPlayerConnection().get(entityPlayer);
+            playerConnection.getClass().getMethod("sendPacket",
+                    NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getPlayerInfoPacket()
+                    .newInstance(NPCSyncMain.plugin.getReflectionUtil().getPlayerInfoPacketEnumConstants()[0], npc));
+            playerConnection.getClass().getMethod("sendPacket",
+                    NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getEntitySpawnPacket()
+                    .newInstance(npc));
+            Bukkit.getScheduler().scheduleSyncDelayedTask(NPCSyncMain.plugin, new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        playerConnection.getClass().getMethod("sendPacket",
+                                NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getPlayerInfoPacket()
+                                .newInstance(NPCSyncMain.plugin.getReflectionUtil().getPlayerInfoPacketEnumConstants()[4], npc));
+                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, 5);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public void cancelVisualization(Player  player){
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
+    public void cancelVisualization(Player  player) {
+        try {
+            Object entityPlayer = NPCSyncMain.plugin.getReflectionUtil().getGetHandleMethod().invoke(player);
+            Object playerConnection = NPCSyncMain.plugin.getReflectionUtil().getPlayerConnection().get(entityPlayer);
+            playerConnection.getClass().getMethod("sendPacket",
+                    NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getEntityDestroyPacket()
+                    .newInstance(NPCSyncMain.plugin.getReflectionUtil().getGetEntityPlayerID().invoke(npc)));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public void cancelAllVisualizations(){
+    public void cancelAllVisualizations() {
         for(Player player : Bukkit.getOnlinePlayers()){
             cancelVisualization(player);
         }
     }
 
-    public void showToAllPlayers(){
+    public void showToAllPlayers() {
         for(Player player : Bukkit.getOnlinePlayers()){
             showToPlayer(player);
             displayArmorForPlayer(player);
         }
     }
 
-    public void setLocation(Location location){
-        npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-        teleportNPCForAllPlayers();
-    }
-
-    public void teleportNPCForAllPlayers(){
-        for(Player player : Bukkit.getOnlinePlayers()){
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityTeleport(npc));
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256/360)));
+    public void setLocation(Location location) {
+        try {
+            NPCSyncMain.plugin.getReflectionUtil().getSetNPCLocationMethod().invoke(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+            teleportNPCForAllPlayers();
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
-    public void displayAnimationForAllPlayers(Animation animation){
-        for(Player player : Bukkit.getOnlinePlayers()){
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutAnimation(npc, animation.getValue()));
+    public void teleportNPCForAllPlayers() {
+        try {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Object entityPlayer = NPCSyncMain.plugin.getReflectionUtil().getGetHandleMethod().invoke(player);
+                Object playerConnection = NPCSyncMain.plugin.getReflectionUtil().getPlayerConnection().get(entityPlayer);
+                playerConnection.getClass().getMethod("sendPacket",
+                        NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getEntityTeleportPacket()
+                        .newInstance(npc));
+                playerConnection.getClass().getMethod("sendPacket",
+                        NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getEntityHeadRotatePacket()
+                        .newInstance(npc, (byte) ((Integer) NPCSyncMain.plugin.getReflectionUtil().getEntityPlayerYaw().get(npc) * 256 / 360)));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
-    public void displayActionForAllPlayers(byte value){
-        for(Player player : Bukkit.getOnlinePlayers()){
-            DataWatcher dataWatcher = npc.getDataWatcher();
-            dataWatcher.set(new DataWatcherObject<Byte>(0, DataWatcherRegistry.a), value);
-            PacketPlayOutEntityMetadata actionPacket = new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, false);
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(actionPacket);
+    public void displayAnimationForAllPlayers(Animation animation) {
+        try {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Object entityPlayer = NPCSyncMain.plugin.getReflectionUtil().getGetHandleMethod().invoke(player);
+                Object playerConnection = NPCSyncMain.plugin.getReflectionUtil().getPlayerConnection().get(entityPlayer);
+                playerConnection.getClass().getMethod("sendPacket",
+                        NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, NPCSyncMain.plugin.getReflectionUtil().getEntityAnimationPacket()
+                        .newInstance(npc, animation.getValue()));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void displayActionForAllPlayers(byte value) {
+        try {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Object dataWatcher = NPCSyncMain.plugin.getReflectionUtil().getGetDataWatcher().invoke(npc);
+                NPCSyncMain.plugin.getReflectionUtil().getDataWatcherSetMethod().invoke(dataWatcher,
+                        NPCSyncMain.plugin.getReflectionUtil().getDataWatcherObjectConstructor().newInstance(0,
+                                NPCSyncMain.plugin.getReflectionUtil().getDataWatcherSerializer()), value);
+                Object actionPacket = NPCSyncMain.plugin.getReflectionUtil().getEntityMetaDataPacket().newInstance(NPCSyncMain.plugin.getReflectionUtil().getGetEntityPlayerID().invoke(npc), dataWatcher, false);
+                Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+                Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+                playerConnection.getClass().getMethod("sendPacket").invoke(actionPacket);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -103,25 +157,35 @@ public class NPC {
     }
 
     public void displayArmorForPlayer(Player player) {
-        if(boots != null) {
-            PacketPlayOutEntityEquipment equipmentPacket = new PacketPlayOutEntityEquipment(npc.getId(), EnumItemSlot.FEET, CraftItemStack.asNMSCopy(boots));
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
-            NPCSyncMain.plugin.getLogger().info(EnumItemSlot.FEET + " " + boots.getType().name());
-        }
-        if(leggings != null) {
-            PacketPlayOutEntityEquipment equipmentPacket = new PacketPlayOutEntityEquipment(npc.getId(), EnumItemSlot.LEGS, CraftItemStack.asNMSCopy(leggings));
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
-            NPCSyncMain.plugin.getLogger().info(EnumItemSlot.LEGS + " " + leggings.getType().name());
-        }
-        if(chestplate != null) {
-            PacketPlayOutEntityEquipment equipmentPacket = new PacketPlayOutEntityEquipment(npc.getId(), EnumItemSlot.CHEST, CraftItemStack.asNMSCopy(chestplate));
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
-            NPCSyncMain.plugin.getLogger().info(EnumItemSlot.CHEST + " " + chestplate.getType().name());
-        }
-        if(helmet != null) {
-            PacketPlayOutEntityEquipment equipmentPacket = new PacketPlayOutEntityEquipment(npc.getId(), EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(helmet));
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
-            NPCSyncMain.plugin.getLogger().info(EnumItemSlot.HEAD + " " + helmet.getType().name());
+        try {
+            Object entityPlayer = NPCSyncMain.plugin.getReflectionUtil().getGetHandleMethod().invoke(player);
+            Object playerConnection = NPCSyncMain.plugin.getReflectionUtil().getPlayerConnection().get(entityPlayer);
+            if (boots != null) {
+                Object equipmentPacket = NPCSyncMain.plugin.getReflectionUtil().getPacketEquipmentConstructor().newInstance(
+                        NPCSyncMain.plugin.getReflectionUtil().getGetEntityPlayerID().invoke(npc),
+                        Enum.valueOf(NPCSyncMain.plugin.getReflectionUtil().getEnumSlotClass(), "FEET"), CraftItemStack.asNMSCopy(boots));
+                playerConnection.getClass().getMethod("sendPacket", NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, equipmentPacket);
+            }
+            if (leggings != null) {
+                Object equipmentPacket = NPCSyncMain.plugin.getReflectionUtil().getPacketEquipmentConstructor().newInstance(
+                        NPCSyncMain.plugin.getReflectionUtil().getGetEntityPlayerID().invoke(npc),
+                        Enum.valueOf(NPCSyncMain.plugin.getReflectionUtil().getEnumSlotClass(), "LEGS"), CraftItemStack.asNMSCopy(leggings));
+                playerConnection.getClass().getMethod("sendPacket", NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, equipmentPacket);
+            }
+            if (chestplate != null) {
+                Object equipmentPacket = NPCSyncMain.plugin.getReflectionUtil().getPacketEquipmentConstructor().newInstance(
+                        NPCSyncMain.plugin.getReflectionUtil().getGetEntityPlayerID().invoke(npc),
+                        Enum.valueOf(NPCSyncMain.plugin.getReflectionUtil().getEnumSlotClass(), "CHEST"), CraftItemStack.asNMSCopy(chestplate));
+                playerConnection.getClass().getMethod("sendPacket", NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, equipmentPacket);
+            }
+            if (helmet != null) {
+                Object equipmentPacket = NPCSyncMain.plugin.getReflectionUtil().getPacketEquipmentConstructor().newInstance(
+                        NPCSyncMain.plugin.getReflectionUtil().getGetEntityPlayerID().invoke(npc),
+                        Enum.valueOf(NPCSyncMain.plugin.getReflectionUtil().getEnumSlotClass(), "HEAD"), CraftItemStack.asNMSCopy(helmet));
+                playerConnection.getClass().getMethod("sendPacket", NPCSyncMain.plugin.getReflectionUtil().getPacketClass()).invoke(playerConnection, equipmentPacket);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

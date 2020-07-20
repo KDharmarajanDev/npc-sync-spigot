@@ -4,7 +4,6 @@ import Mathematician.NPCSync.NPC.NPCAction;
 import Mathematician.NPCSync.NPCSyncData.NPCSyncDataHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
